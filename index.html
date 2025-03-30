@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anime Suchseite</title>
+    <style>
+       body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1f1f1f;
+            color: #f0f0f0;
+            margin: 0;
+        }
+        h1 {
+            text-align: center;
+            padding: 20px;
+            background-color: #282828;
+            font-size: 2.5em;
+            margin: 0;
+        }
+        .search-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .search-container input,
+        .search-container button {
+            padding: 10px;
+            font-size: 1em;
+        }
+        .search-container input {
+            width: 300px;
+            border: none;
+            border-radius: 5px 0 0 5px;
+        }
+        .search-container button {
+            border: none;
+            border-radius: 0 5px 5px 0;
+            background-color: #f39c12;
+            color: #fff;
+            cursor: pointer;
+        }
+        .anime-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 20px;
+        }
+        .anime-result {
+            background-color: #282828;
+            margin: 10px;
+            padding: 20px;
+            border-radius: 5px;
+            width: 300px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            cursor: pointer;
+            position: relative;
+        }
+        .anime-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #f39c12;
+        }
+        .anime-poster {
+            width: 100%;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            transition: transform 0.3s;
+        }
+        .anime-poster:hover {
+            transform: scale(1.05);
+        }
+        .anime-details {
+            display: none;
+            text-align: left;
+        }
+        .anime-genres,
+        .anime-description,
+        .anime-years {
+            margin-top: 10px;
+        }
+        .season-container,
+        .episode-link {
+            margin-top: 10px;
+        }
+        .episode-link {
+            display: block;
+            padding: 10px;
+            text-decoration: none;
+            color: #fff;
+            background-color: #3498db;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .episode-link:hover {
+            background-color: #2980b9;
+        }
+        .button-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        .impressum-button,
+        .watchlist-button {
+            background-color: #f39c12;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            cursor: pointer;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding-top: 60px;
+        }
+        .modal-content {
+            background-color: #282828;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            color: #fff;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: white;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .link-category {
+            margin: 10px 0;
+            display: inline-block;
+            width: 30%;
+            vertical-align: top;
+        }
+        .link-category h3 {
+            margin-top: 0;
+        }
+        .add-to-watchlist {
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .add-to-watchlist:hover {
+            background-color: #2980b9;
+        }
+        .remove-from-watchlist {
+            background-color: #e74c3c;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .remove-from-watchlist:hover {
+            background-color: #c0392b;
+        }
+        .watchlist-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .iframe-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%;
+            height: 0;
+            margin-top: 20px;
+        }
+        .iframe-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .login-button, .account-button {
+            background-color: #f39c12;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            cursor: pointer;
+        }
+        .login-modal input, .account-modal input {
+            display: block;
+            width: 100%;
+            margin: 10px 0;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+        }
+        .login-modal button, .account-modal button {
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+        .login-modal button:hover, .account-modal button:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <h1>Anime Suchseite</h1>
+    <div class="button-container">
+        <button class="impressum-button" id="impressumButton">Impressum</button>
+        <button class="watchlist-button" id="watchlistButton">Watchlist anzeigen</button>
+        <button class="login-button" id="loginButton">Login</button>
+        <button class="account-button" id="accountButton" style="display: none;">Mein Account</button>
+    </div>
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Nach Anime suchen...">
+        <button id="searchButton">Suchen</button>
+    </div>
+    <div id="results" class="anime-container"></div>
+
+    <!-- Modal für das Impressum -->
+    <div id="impressumModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeModal">×</span>
+            <h2>Impressum</h2>
+            <!-- Dein bestehendes Impressum bleibt unverändert -->
+        </div>
+    </div>
+
+    <!-- Modal für die Episode-Links -->
+    <div id="linksModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeLinksModal">×</span>
+            <h2 id="episodeLinksTitle">Episode links</h2>
+            <div id="linksContent"></div>
+            <div class="iframe-container" id="iframeContainer">
+                <iframe id="videoIframe" src="" allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal für die Watchlist -->
+    <div id="watchlistModal" class="modal">
+        <div class="modal-content">
+            <span class="close">×</span>
+            <h2>Ihre Watchlist</h2>
+            <div id="watchlistContent" class="watchlist-container"></div>
+        </div>
+    </div>
+
+    <!-- Modal für Login -->
+    <div id="loginModal" class="modal login-modal">
+        <div class="modal-content">
+            <span class="close" id="closeLoginModal">×</span>
+            <h2>Login</h2>
+            <input type="text" id="username" placeholder="Benutzername">
+            <input type="password" id="password" placeholder="Passwort">
+            <button id="loginSubmit">Einloggen</button>
+            <button id="registerSubmit">Registrieren</button>
+        </div>
+    </div>
+
+    <!-- Modal für Mein Account -->
+    <div id="accountModal" class="modal account-modal">
+        <div class="modal-content">
+            <span class="close" id="closeAccountModal">×</span>
+            <h2>Mein Account</h2>
+            <button id="logoutButton">Ausloggen</button>
+        </div>
+    </div>
+
+    <script>
+        const searchButton = document.getElementById('searchButton');
+        const searchInput = document.getElementById('searchInput');
+        const resultsDiv = document.getElementById('results');
+        const impressumButton = document.getElementById('impressumButton');
+        const watchlistButton = document.getElementById('watchlistButton');
+        const loginButton = document.getElementById('loginButton');
+        const accountButton = document.getElementById('accountButton');
+        const impressumModal = document.getElementById('impressumModal');
+        const closeModal = document.getElementById('closeModal');
+        const linksModal = document.getElementById('linksModal');
+        const closeLinksModal = document.getElementById('closeLinksModal');
+        const watchlistModal = document.getElementById('watchlistModal');
+        const loginModal = document.getElementById('loginModal');
+        const closeLoginModal = document.getElementById('closeLoginModal');
+        const accountModal = document.getElementById('accountModal');
+        const closeAccountModal = document.getElementById('closeAccountModal');
+        const loginSubmit = document.getElementById('loginSubmit');
+        const registerSubmit = document.getElementById('registerSubmit');
+        const logoutButton = document.getElementById('logoutButton');
+        const episodeLinksTitle = document.getElementById('episodeLinksTitle');
+
+        // Cookie-Helferfunktionen
+        function setCookie(name, value, days) {
+  const expires = new Date();
+  expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+  const secure = window.location.protocol === 'https:' ? ';Secure' : '';
+  document.cookie = `${encodeURIComponent(name)}=${encodeURIComponent(value)};expires=${expires.toUTCString()};path=/;SameSite=Strict${secure}`;
+}
+
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+            return null;
+        }
+
+        function deleteCookie(name) {
+            document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;`;
+        }
+
+        let token = getCookie('authToken'); // Token aus Cookie laden
+
+        // UI basierend auf Login-Status aktualisieren
+        function updateLoginUI() {
+            if (token) {
+                loginButton.style.display = 'none';
+                accountButton.style.display = 'inline-block';
+            } else {
+                loginButton.style.display = 'inline-block';
+                accountButton.style.display = 'none';
+            }
+        }
+
+        // Event-Listener für Login-Button
+        loginButton.addEventListener('click', () => {
+            loginModal.style.display = 'block';
+        });
+
+        // Event-Listener für Account-Button
+        accountButton.addEventListener('click', () => {
+            accountModal.style.display = 'block';
+        });
+
+        // Event-Listener für Logout-Button
+        logoutButton.addEventListener('click', () => {
+            deleteCookie('authToken');
+            token = null;
+            accountModal.style.display = 'none';
+            updateLoginUI();
+            localStorage.removeItem('watchlist'); // Lokale Watchlist löschen nach Logout
+            alert('Erfolgreich ausgeloggt!');
+        });
+
+        closeLoginModal.addEventListener('click', () => {
+            loginModal.style.display = 'none';
+        });
+
+        closeAccountModal.addEventListener('click', () => {
+            accountModal.style.display = 'none';
+        });
+
+        window.addEventListener('click', (event) => {
+            if (event.target === impressumModal) impressumModal.style.display = 'none';
+            if (event.target === linksModal) linksModal.style.display = 'none';
+            if (event.target === watchlistModal) watchlistModal.style.display = 'none';
+            if (event.target === loginModal) loginModal.style.display = 'none';
+            if (event.target === accountModal) accountModal.style.display = 'none';
+        });
+
+        // Login-Funktion
+        loginSubmit.addEventListener('click', async () => {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            try {
+                const response = await fetch('https://as7d.onrender.com/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    token = data.token;
+                    setCookie('authToken', token, 7); // Token für 7 Tage speichern
+                    loginModal.style.display = 'none';
+                    updateLoginUI();
+                    alert('Erfolgreich eingeloggt!');
+                    await syncWatchlist(); // Watchlist synchronisieren nach Login
+                } else {
+                    alert(data.message || 'Login fehlgeschlagen');
+                }
+            } catch (error) {
+                console.error('Fehler beim Login:', error);
+                alert('Ein Fehler ist aufgetreten');
+            }
+        });
+
+        // Registrierungs-Funktion
+        registerSubmit.addEventListener('click', async () => {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            try {
+                const response = await fetch('https://as7d.onrender.com/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    alert('Registrierung erfolgreich! Bitte einloggen.');
+                } else {
+                    alert(data.message || 'Registrierung fehlgeschlagen');
+                }
+            } catch (error) {
+                console.error('Fehler bei der Registrierung:', error);
+                alert('Ein Fehler ist aufgetreten');
+            }
+        });
+
+        // Bestehende Funktionen (Suche, Impressum, etc.)
+        searchButton.addEventListener('click', () => {
+            const query = searchInput.value;
+            fetch(`https://animav6.bot.nu/p/https://fireani.me/api/anime/search?q=${query}`)
+                .then(response => response.json())
+                .then(data => displayResults(data.data))
+                .catch(error => console.error('Fehler:', error));
+        });
+
+        impressumButton.addEventListener('click', () => {
+            impressumModal.style.display = 'block';
+        });
+
+        closeModal.addEventListener('click', () => {
+            impressumModal.style.display = 'none';
+        });
+
+        closeLinksModal.addEventListener('click', () => {
+            linksModal.style.display = 'none';
+        });
+
+        watchlistButton.addEventListener('click', displayWatchlist);
+
+        function displayResults(animes) {
+            resultsDiv.innerHTML = '';
+            animes.forEach(anime => {
+                const animeDiv = document.createElement('div');
+                animeDiv.classList.add('anime-result');
+                animeDiv.innerHTML = `
+                    <div class="anime-title">${anime.title}</div>
+                    <img class="anime-poster" src="https://fireani.me/img/posters/${anime.poster}">
+                    <div class="anime-details"></div>
+                    <button class="add-to-watchlist">Zur Watchlist hinzufügen</button>
+                `;
+                animeDiv.addEventListener('click', (event) => {
+                    const detailsDiv = animeDiv.querySelector('.anime-details');
+                    if (event.target === animeDiv || event.target.tagName === 'DIV' || event.target.tagName === 'IMG') {
+                        if (!detailsDiv.style.display || detailsDiv.style.display === 'none') {
+                            fetch(`https://animav6.bot.nu/p/https://fireani.me/api/anime?slug=${anime.slug}`)
+                                .then(response => response.json())
+                                .then(data => {
+                                    displayAnimeDetails(detailsDiv, data.data);
+                                    displaySeasons(detailsDiv, data.data.anime_seasons, anime.slug);
+                                    detailsDiv.style.display = 'block';
+                                })
+                                .catch(error => console.error('Fehler:', error));
+                        } else {
+                            detailsDiv.style.display = 'none';
+                        }
+                    }
+                });
+                resultsDiv.appendChild(animeDiv);
+            });
+        }
+
+        function displayAnimeDetails(detailsDiv, animeData) {
+            detailsDiv.innerHTML = `
+                <div class="anime-genres">Genres: ${animeData.generes.join(', ')}</div>
+                <div class="anime-description">Beschreibung: ${animeData.desc}</div>
+                <div class="anime-years">Produziert: ${animeData.start} - ${animeData.end}</div>
+            `;
+        }
+
+        function displaySeasons(detailsDiv, seasons, slug) {
+            seasons.forEach(season => {
+                const seasonDiv = document.createElement('div');
+                seasonDiv.classList.add('season-container');
+                seasonDiv.innerHTML = `<h2>Staffel ${season.season}</h2>`;
+                season.anime_episodes.forEach(episode => {
+                    const episodeLink = document.createElement('a');
+                    episodeLink.classList.add('episode-link');
+                    episodeLink.innerText = `Episode ${episode.episode}`;
+                    episodeLink.href = '#';
+                    episodeLink.onclick = (e) => {
+                        e.preventDefault();
+                        fetchEpisodeLinks(slug, season.season, episode.episode);
+                    };
+                    seasonDiv.appendChild(episodeLink);
+                });
+                detailsDiv.appendChild(seasonDiv);
+            });
+        }
+
+        function fetchEpisodeLinks(slug, season, episode) {
+            fetch(`https://animav6.bot.nu/p/https://fireani.me/api/anime/episode?slug=${slug}&season=${season}&episode=${episode}`)
+                .then(response => response.json())
+                .then(data => {
+                    episodeLinksTitle.innerText = `Episode links (Episode ${episode})`;
+                    displayEpisodeLinks(data.data.anime_episode_links);
+                })
+                .catch(error => console.error('Fehler:', error));
+        }
+
+        function displayEpisodeLinks(links) {
+            const linksContent = document.getElementById('linksContent');
+            linksContent.innerHTML = '';
+            const categories = {
+                "Deutsche Synchronsprache": [],
+                "Deutscher Untertitel": [],
+                "Englischer Untertitel": []
+            };
+            links.forEach(link => {
+                if (link.lang.toLowerCase() === 'ger-dub') categories["Deutsche Synchronsprache"].push(link);
+                else if (link.lang.toLowerCase() === 'ger-sub') categories["Deutscher Untertitel"].push(link);
+                else if (link.lang.toLowerCase() === 'eng-sub') categories["Englischer Untertitel"].push(link);
+            });
+            for (const [category, linksArray] of Object.entries(categories)) {
+                if (linksArray.length > 0) {
+                    const categoryDiv = document.createElement('div');
+                    categoryDiv.classList.add('link-category');
+                    const categoryTitle = document.createElement('h3');
+                    categoryTitle.innerText = category;
+                    categoryDiv.appendChild(categoryTitle);
+                    linksArray.forEach(link => {
+                        const a = document.createElement('a');
+                        a.href = '#';
+                        a.innerText = `${link.name}`;
+                        a.classList.add('episode-link');
+                        a.onclick = (e) => {
+                            e.preventDefault();
+                            document.getElementById('videoIframe').src = link.link;
+                        };
+                        categoryDiv.appendChild(a);
+                    });
+                    linksContent.appendChild(categoryDiv);
+                }
+            }
+            linksModal.style.display = 'block';
+        }
+
+        // Watchlist-Anzeige
+        function displayWatchlist() {
+            const watchlist = JSON.parse(localStorage.getItem('watchlist')) || [];
+            const watchlistContent = watchlistModal.querySelector('#watchlistContent');
+            watchlistContent.innerHTML = '';
+            if (watchlist.length === 0) {
+                watchlistContent.innerHTML = '<p>Ihre Watchlist ist leer.</p>';
+            } else {
+                watchlist.forEach((anime, index) => {
+                    const animeDiv = document.createElement('div');
+                    animeDiv.classList.add('anime-result');
+                    animeDiv.innerHTML = `
+                        <div class="anime-title">${anime.title}</div>
+                        <img class="anime-poster" src="https://fireani.me/img/posters/${anime.poster}">
+                        <button class="remove-from-watchlist" data-index="${index}">Aus Watchlist entfernen</button>
+                    `;
+                    watchlistContent.appendChild(animeDiv);
+                });
+            }
+            watchlistModal.style.display = 'block';
+        }
+
+        // Watchlist hinzufügen
+        document.addEventListener('click', async (event) => {
+            if (event.target.classList.contains('add-to-watchlist')) {
+                const animeDiv = event.target.closest('.anime-result');
+                const animeTitle = animeDiv.querySelector('.anime-title').innerText;
+                const animePoster = animeDiv.querySelector('.anime-poster').src;
+                const anime = { title: animeTitle, poster: animePoster.split('/').pop() };
+                await addToWatchlist(anime);
+            }
+            if (event.target.classList.contains('remove-from-watchlist')) {
+                const index = event.target.getAttribute('data-index');
+                await removeFromWatchlist(index);
+            }
+        });
+
+        watchlistModal.querySelector('.close').addEventListener('click', () => {
+            watchlistModal.style.display = 'none';
+        });
+
+        async function addToWatchlist(anime) {
+            let watchlist = JSON.parse(localStorage.getItem('watchlist')) || [];
+            if (!watchlist.some(item => item.title === anime.title)) {
+                watchlist.push(anime);
+                localStorage.setItem('watchlist', JSON.stringify(watchlist));
+                if (token) await syncWatchlistToServer(watchlist); // Echtzeit-Synchronisation
+                alert(`${anime.title} wurde zur Watchlist hinzugefügt.`);
+                displayWatchlist(); // Watchlist sofort aktualisieren
+            } else {
+                alert(`${anime.title} ist bereits in der Watchlist.`);
+            }
+        }
+
+        async function removeFromWatchlist(index) {
+            let watchlist = JSON.parse(localStorage.getItem('watchlist')) || [];
+            watchlist.splice(index, 1);
+            localStorage.setItem('watchlist', JSON.stringify(watchlist));
+            if (token) await syncWatchlistToServer(watchlist); // Echtzeit-Synchronisation
+            displayWatchlist(); // Watchlist sofort aktualisieren
+        }
+
+        // Watchlist mit Server synchronisieren (nur Server-Daten übernehmen)
+        async function syncWatchlist() {
+            if (!token) return; // Keine Synchronisation, wenn nicht eingeloggt
+            try {
+                const response = await fetch('https://as7d.onrender.com/watchlist', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!response.ok) throw new Error('Fehler beim Abrufen der Watchlist');
+                const serverWatchlist = await response.json();
+                localStorage.setItem('watchlist', JSON.stringify(serverWatchlist)); // Nur Server-Daten übernehmen
+            } catch (error) {
+                console.error('Fehler bei der Synchronisation:', error);
+                if (error.message.includes('Ungültiges Token')) {
+                    deleteCookie('authToken');
+                    token = null;
+                    updateLoginUI();
+                    alert('Sitzung abgelaufen. Bitte erneut einloggen.');
+                }
+            }
+        }
+
+        async function syncWatchlistToServer(watchlist) {
+            if (!token) return; // Keine Synchronisation, wenn nicht eingeloggt
+            try {
+                const response = await fetch('https://as7d.onrender.com/watchlist', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ watchlist })
+                });
+                if (!response.ok) throw new Error('Fehler beim Senden der Watchlist');
+            } catch (error) {
+                console.error('Fehler beim Senden der Watchlist:', error);
+            }
+        }
+
+        // Beim Laden der Seite UI aktualisieren und Watchlist synchronisieren
+        updateLoginUI();
+        if (token) syncWatchlist();
+    </script>
+</body>
+</html>
